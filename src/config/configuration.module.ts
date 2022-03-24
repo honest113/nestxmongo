@@ -12,6 +12,8 @@ import { EEnvType } from 'src/constants/env.type';
         [EEnvType.NODE_ENV]: Joi.string().valid('development', 'production', 'test').default('development'),
         [EEnvType.PORT]: Joi.number().default(3000),
         [EEnvType.MONGO_URI]: Joi.string().required(),
+        [EEnvType.BCRYPT_SALT_ROUND]: Joi.number().default(14),
+        [EEnvType.JWT_SECRET_KEY]: Joi.string().required(),
       }),
     }),
   ],

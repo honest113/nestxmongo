@@ -1,10 +1,13 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import mongoose from 'mongoose';
 import { IBaseAttribute, IDateDeletedAt } from './schema-attribute/base-attribute.interface';
 
 export type UserDocument = User & Document;
 
 @Schema()
 export class User implements IBaseAttribute, IDateDeletedAt {
+  _id: mongoose.Schema.Types.ObjectId;
+
   @Prop({
     required: true,
     unique: true,
@@ -18,7 +21,7 @@ export class User implements IBaseAttribute, IDateDeletedAt {
   @Prop({ required: true })
   password: string;
 
-  @Prop()
+  @Prop({ default: null })
   fullName: string;
 
   @Prop({ min: 1 })
