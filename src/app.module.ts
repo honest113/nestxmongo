@@ -3,10 +3,12 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigurationModule } from './config/configuration.module';
 import { MongoModule } from './database/mongodb/mongodb.module';
+import { MODULES } from './modules';
 import { HttpLoggerMiddleware } from './share/middleware/http-logger.middleware';
+import { PipeModule } from './share/pipe/pipe.module';
 
 @Module({
-  imports: [ConfigurationModule, MongoModule],
+  imports: [ConfigurationModule, MongoModule, PipeModule, ...MODULES],
   controllers: [AppController],
   providers: [AppService],
 })
