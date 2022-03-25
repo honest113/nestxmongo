@@ -55,13 +55,4 @@ export class AuthService {
 
     return { id: result._id };
   }
-
-  async test(token) {
-    try {
-      const check = this.tokenService.verifyJwt(token);
-      console.log(check);
-    } catch (err) {
-      httpUnauthorized();
-    }
-  }
 }

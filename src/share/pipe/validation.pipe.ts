@@ -1,4 +1,4 @@
-import { ArgumentMetadata, Logger, PipeTransform } from '@nestjs/common';
+import { ArgumentMetadata, PipeTransform } from '@nestjs/common';
 import { plainToClass } from 'class-transformer';
 import { validate } from 'class-validator';
 import { httpBadRequest } from '../exception/http-exception';
@@ -9,11 +9,7 @@ function toValidate(metatype: Function): boolean {
 }
 
 export class ValidationBodyPipe implements PipeTransform<any> {
-  private readonly logger = new Logger(ValidationBodyPipe.name);
-
   async transform(value: any, { metatype, type }: ArgumentMetadata) {
-    this.logger.log('Transform Pipe');
-
     if (type !== 'body') return value;
 
     if (!metatype || !toValidate(metatype)) {

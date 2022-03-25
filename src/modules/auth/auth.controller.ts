@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Post, Request } from '@nestjs/common';
+import { Body, Controller, Post } from '@nestjs/common';
+import { GuardPublic } from 'src/guard/guard.decorator';
 import { AuthService } from './auth.service';
 import { LoginUserDto, SignUpUserBodyRequestDto } from './dtos/auth.dto';
 
@@ -6,19 +7,14 @@ import { LoginUserDto, SignUpUserBodyRequestDto } from './dtos/auth.dto';
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  test(@Request() request: Request) {
-    const bearerToken = (request.headers as any).authorization.split(' ')[1];
-    console.log(bearerToken);
-    return this.authService.test(bearerToken);
-  }
-
   @Post('sign-up')
+  @GuardPublic()
   signUp(@Body() body: SignUpUserBodyRequestDto) {
     return this.authService.signup(body);
   }
 
   @Post('log-in')
+  @GuardPublic()
   login(@Body() body: LoginUserDto) {
     return this.authService.login(body);
   }
