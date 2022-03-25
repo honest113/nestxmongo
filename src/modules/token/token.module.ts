@@ -13,7 +13,7 @@ import { TokenService } from './token.service';
         return {
           secret: configService.get<string>(EEnvType.JWT_SECRET_KEY),
           signOptions: {
-            expiresIn: '1h',
+            expiresIn: '30d',
           },
         };
       },
