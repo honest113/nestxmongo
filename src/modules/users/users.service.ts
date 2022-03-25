@@ -4,7 +4,7 @@ import { User, UserDocument } from 'src/schemas/user.schema';
 import { Model } from 'mongoose';
 import { EUserRole, EUserStatus } from 'src/constants/schema.constant';
 import { IUserRegister } from '../auth/interfaces/auth.interface';
-import { UpdateUserRequestDto } from './dtos/users.dto';
+import { UpdateUserRequestDto, UserResponseDto } from './dtos/users.dto';
 import { MongoId } from 'src/share/type/common.type';
 import { httpNotFound } from 'src/share/exception/http-exception';
 
@@ -21,6 +21,14 @@ export class UsersService {
       query.select(select);
     }
     return await query.exec();
+  }
+
+  async getUser(userId: MongoId) {
+    const user = await this.userModel
+      .findOne({ _id: userId, status: EUserStatus.ACTIVE, deletedAt: null }, { email: true, fullName: true })
+      .lean()
+      .exec();
+    return new UserResponseDto(user);
   }
 
   async isActiveUser(userId: MongoId): Promise<boolean> {
