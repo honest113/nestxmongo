@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { EEnvType } from 'src/constants/env.type';
 import { EError } from 'src/constants/error-code.constant';
@@ -12,6 +12,7 @@ import { TokenService } from '../token/token.service';
 
 @Injectable()
 export class AuthService {
+  private readonly logger = new Logger(AuthService.name);
   constructor(
     private readonly configService: ConfigService,
     private readonly tokenService: TokenService,
@@ -30,6 +31,8 @@ export class AuthService {
   }
 
   async login(data: LoginUserDto) {
+    this.logger.debug('login logic here');
+
     const user = await this.usersService.getUserByAttribute(
       { email: data.email, deletedAt: null, status: EUserStatus.ACTIVE },
       { email: true, password: true, role: true },
