@@ -12,7 +12,6 @@ import { UsersService } from './users.service';
         useFactory: () => {
           const schema = UserSchema;
           schema.pre<User>('save', async function () {
-            // const user = this;
             this.updatedAt = new Date();
           });
           return schema;
