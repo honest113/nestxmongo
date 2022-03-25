@@ -1,4 +1,4 @@
-import { CallHandler, ExecutionContext, Logger, NestInterceptor } from '@nestjs/common';
+import { CallHandler, ExecutionContext, NestInterceptor } from '@nestjs/common';
 import { map, Observable } from 'rxjs';
 
 class ResponseSuccess {
@@ -18,10 +18,7 @@ class ResponseSuccess {
 }
 
 export class ResponseInterceptor implements NestInterceptor {
-  private readonly logger = new Logger(ResponseInterceptor.name);
-
   intercept(context: ExecutionContext, next: CallHandler<any>): Observable<any> | Promise<Observable<any>> {
-    this.logger.log('Interceptor');
     return next.handle().pipe(map(data => new ResponseSuccess(data)));
   }
 }

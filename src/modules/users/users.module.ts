@@ -12,8 +12,8 @@ import { UsersService } from './users.service';
         useFactory: () => {
           const schema = UserSchema;
           schema.pre<User>('save', async function () {
-            const user = this;
-            user.updatedAt = new Date();
+            // const user = this;
+            this.updatedAt = new Date();
           });
           return schema;
         },
@@ -22,6 +22,6 @@ import { UsersService } from './users.service';
   ],
   controllers: [UsersController],
   providers: [UsersService],
-  exports: [MongooseModule],
+  exports: [MongooseModule, UsersService],
 })
 export class UsersModule {}
