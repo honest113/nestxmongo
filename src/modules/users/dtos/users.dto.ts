@@ -1,8 +1,23 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { Exclude, Expose } from 'class-transformer';
+import { Exclude, Expose, Type } from 'class-transformer';
 import { IsNotEmpty, IsString } from 'class-validator';
 import { User } from 'src/schemas/user.schema';
 import { MongoId } from 'src/share/type/common.type';
+
+@Exclude()
+class UserAddress {
+  @ApiProperty()
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  city: string;
+
+  @ApiProperty()
+  @Expose()
+  @IsString()
+  @IsNotEmpty()
+  street: string;
+}
 
 @Exclude()
 export class UpdateUserRequestDto {
@@ -11,6 +26,11 @@ export class UpdateUserRequestDto {
   @IsString()
   @IsNotEmpty()
   fullName: string;
+
+  @ApiProperty({ type: UserAddress })
+  @Expose()
+  @Type(() => UserAddress)
+  address: UserAddress;
 }
 
 @Exclude()
@@ -28,6 +48,11 @@ export class UserResponseDto {
   @ApiProperty()
   @Expose()
   fullName: string;
+
+  @ApiProperty({ type: UserAddress })
+  @Expose()
+  @Type(() => UserAddress)
+  address: UserAddress;
 
   _id: MongoId;
 

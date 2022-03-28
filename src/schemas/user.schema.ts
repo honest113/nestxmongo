@@ -1,6 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import mongoose from 'mongoose';
+import { Address, AddressSchema } from './address.schema';
 import { IBaseAttribute, IDateDeletedAt } from './schema-attribute/base-attribute.interface';
+import { Document } from 'mongoose';
 
 export type UserDocument = User & Document;
 
@@ -29,6 +31,9 @@ export class User implements IBaseAttribute, IDateDeletedAt {
 
   @Prop({ min: 1 })
   status: number;
+
+  @Prop({ type: AddressSchema })
+  address: Address;
 
   @Prop({ type: Date, required: true, default: Date.now })
   createdAt: Date;

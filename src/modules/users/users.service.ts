@@ -7,6 +7,7 @@ import { IUserRegister } from '../auth/interfaces/auth.interface';
 import { UpdateUserRequestDto, UserResponseDto } from './dtos/users.dto';
 import { MongoId } from 'src/share/type/common.type';
 import { httpNotFound } from 'src/share/exception/http-exception';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class UsersService {
@@ -15,7 +16,7 @@ export class UsersService {
     private readonly userModel: Model<UserDocument>,
   ) {}
 
-  async getUserByAttribute(attribute?: Partial<UserDocument>, select?: Object) {
+  async getUserByAttribute(attribute?: FilterQuery<UserDocument>, select?: Object) {
     const query = this.userModel.findOne(attribute).select(select);
     if (select) {
       query.select(select);
@@ -25,7 +26,10 @@ export class UsersService {
 
   async getUser(userId: MongoId) {
     const user = await this.userModel
-      .findOne({ _id: userId, status: EUserStatus.ACTIVE, deletedAt: null }, { email: true, fullName: true })
+      .findOne(
+        { _id: userId, status: EUserStatus.ACTIVE, deletedAt: null },
+        { email: true, fullName: true, address: true },
+      )
       .lean()
       .exec();
     return new UserResponseDto(user);
