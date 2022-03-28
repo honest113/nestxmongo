@@ -11,7 +11,7 @@ export class ActiveGuard implements CanActivate {
   constructor(private reflector: Reflector, private readonly usersService: UsersService) {}
 
   async canActivate(context: ExecutionContext) {
-    this.logger.log('ACTIVE GUARD');
+    // this.logger.log('ACTIVE GUARD');
     const isPublic = this.reflector.getAllAndOverride<boolean>(EGuardDecoratorKey.IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),

@@ -8,11 +8,12 @@ import {
   Request,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiOkResponse } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOkResponse, ApiTags } from '@nestjs/swagger';
 import { IJwtPayload } from 'src/share/interface/auth.interface';
 import { UpdateUserRequestDto, UserResponseDto } from './dtos/users.dto';
 import { UsersService } from './users.service';
 
+@ApiTags('User')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
