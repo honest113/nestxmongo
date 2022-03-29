@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
+import { InjectConnection, InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument } from 'src/schemas/user.schema';
 import { Model } from 'mongoose';
 import { EUserRole, EUserStatus } from 'src/constants/schema.constant';
@@ -8,12 +8,18 @@ import { UpdateUserRequestDto, UserResponseDto } from './dtos/users.dto';
 import { MongoId } from 'src/share/type/common.type';
 import { httpNotFound } from 'src/share/exception/http-exception';
 import { FilterQuery } from 'mongoose';
+import mongoose from 'mongoose';
+import { PostsService } from '../posts/posts.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectModel(User.name)
     private readonly userModel: Model<UserDocument>,
+    @InjectConnection()
+    private readonly connection: mongoose.Connection,
+    @Inject(forwardRef(() => PostsService))
+    private readonly postsService: PostsService,
   ) {}
 
   async getUserByAttribute(attribute?: FilterQuery<UserDocument>, select?: Object) {
@@ -65,8 +71,20 @@ export class UsersService {
     if (!user) {
       httpNotFound();
     }
-    user.deletedAt = new Date();
-    await user.save();
+
+    const session = await this.connection.startSession();
+    session.startTransaction();
+    try {
+      user.deletedAt = new Date();
+      await user.save({ session: session });
+      await this.postsService.deletePostWithAuthorId(userId, session);
+      await session.commitTransaction();
+    } catch (error) {
+      await session.abortTransaction();
+      throw error;
+    } finally {
+      await session.endSession();
+    }
     return true;
   }
 }

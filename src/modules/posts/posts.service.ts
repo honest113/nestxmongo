@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { forwardRef, Inject, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Post, PostDocument } from 'src/schemas/post.schema';
 import { Model } from 'mongoose';
@@ -8,11 +8,13 @@ import { EUserStatus } from 'src/constants/schema.constant';
 import { httpNotFound, httpUnauthorized } from 'src/share/exception/http-exception';
 import { MongoId } from 'src/share/type/common.type';
 import { IPagination } from 'src/share/interface/auth.interface';
+import mongoose from 'mongoose';
 
 @Injectable()
 export class PostsService {
   constructor(
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
+    @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
   ) {}
 
@@ -72,6 +74,17 @@ export class PostsService {
 
     post.deletedAt = new Date();
     await post.save();
+    return true;
+  }
+
+  async deletePostWithAuthorId(authorId: MongoId, session: mongoose.ClientSession | null = null) {
+    const listPosts = await this.postModel.find({ author: authorId, deletedAt: null }).exec();
+    await Promise.all(
+      listPosts.map(async post => {
+        post.deletedAt = new Date();
+        await post.save({ session: session });
+      }),
+    );
     return true;
   }
 }
