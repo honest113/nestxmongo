@@ -5,7 +5,7 @@ import { JwtService, JwtSignOptions, JwtVerifyOptions } from '@nestjs/jwt';
 export class TokenService {
   constructor(private readonly jwtService: JwtService) {}
 
-  signJwt(payload: Object, jwtSignOptions?: JwtSignOptions) {
+  signJwt(payload: any, jwtSignOptions?: JwtSignOptions) {
     return this.jwtService.sign(payload, jwtSignOptions);
   }
 

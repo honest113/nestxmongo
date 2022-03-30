@@ -3,6 +3,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from 'src/schemas/user.schema';
 import { PostsModule } from '../posts/posts.module';
 import { UsersController } from './users.controller';
+import { UsersRepository } from './users.repository';
 import { UsersService } from './users.service';
 
 @Module({
@@ -22,7 +23,7 @@ import { UsersService } from './users.service';
     forwardRef(() => PostsModule),
   ],
   controllers: [UsersController],
-  providers: [UsersService],
+  providers: [UsersService, UsersRepository],
   exports: [MongooseModule, UsersService],
 })
 export class UsersModule {}

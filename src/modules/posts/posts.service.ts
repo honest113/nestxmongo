@@ -9,6 +9,7 @@ import { httpNotFound, httpUnauthorized } from 'src/share/exception/http-excepti
 import { MongoId } from 'src/share/type/common.type';
 import { IPagination } from 'src/share/interface/auth.interface';
 import mongoose from 'mongoose';
+import { PostsRepository } from './posts.repository';
 
 @Injectable()
 export class PostsService {
@@ -16,6 +17,7 @@ export class PostsService {
     @InjectModel(Post.name) private readonly postModel: Model<PostDocument>,
     @Inject(forwardRef(() => UsersService))
     private readonly usersService: UsersService,
+    private readonly postsRepository: PostsRepository,
   ) {}
 
   async createPost(authorId: MongoId, payload: CreatePostRequestDto) {
@@ -29,25 +31,25 @@ export class PostsService {
     const newPost = new this.postModel(payload);
     newPost.author = author;
     await newPost.save();
-    return newPost._id;
+    return newPost.id;
   }
 
   async getListPosts(pagination: IPagination) {
-    const query = this.postModel.find({ deletedAt: null }).populate('author');
-    if (pagination?.page) {
-      query.skip(pagination.page * (pagination?.limit || 20));
-    }
-    if (pagination?.limit) {
-      query.limit(pagination.limit);
-    }
-    const listPosts = await query.lean().exec();
+    // const query = this.postModel.find({ deletedAt: null }).populate('author');
+    // if (pagination?.page) {
+    //   query.skip(pagination.page * (pagination?.limit || 20));
+    // }
+    // if (pagination?.limit) {
+    //   query.limit(pagination.limit);
+    // }
+    const listPosts = await this.postsRepository.getListPost(pagination);
     const listData = listPosts.map(item => new ListPostDataResponseDto(item));
     return listData;
   }
 
   async getPostById(postId: string) {
     const post = await this.postModel
-      .findOne({ id: postId, deletedAt: null })
+      .findOne({ _id: postId, deletedAt: null })
       .populate({
         path: 'author',
         match: { deletedAt: null },
@@ -69,7 +71,7 @@ export class PostsService {
   }
 
   async deletePost(authorId: MongoId, postId: string) {
-    const post = await this.postModel.findOne({ id: postId, author: authorId, deletedAt: null }).exec();
+    const post = await this.postModel.findOne({ _id: postId, author: authorId, deletedAt: null }).exec();
     if (!post) httpNotFound('Post Not Found');
 
     post.deletedAt = new Date();
@@ -78,7 +80,7 @@ export class PostsService {
   }
 
   async deletePostWithAuthorId(authorId: MongoId, session: mongoose.ClientSession | null = null) {
-    const listPosts = await this.postModel.find({ author: authorId, deletedAt: null }).exec();
+    const listPosts = await this.postsRepository.getModel().find({ author: authorId, deletedAt: null }).exec();
     await Promise.all(
       listPosts.map(async post => {
         post.deletedAt = new Date();
